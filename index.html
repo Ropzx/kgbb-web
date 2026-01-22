@@ -117,7 +117,7 @@
     function setViewClass() {
       const h = (location.hash || "#home").replace("#", "");
 
-      document.body.classList.remove("view-home","view-tools","view-links","view-key");
+      document.body.classList.remove("view-tools","view-links","view-key");
       if (h === "tools") document.body.classList.add("view-tools");
       else if (h === "links") document.body.classList.add("view-links");
       else if (h === "key") document.body.classList.add("view-key");
@@ -138,7 +138,7 @@
       }, 260);
     }
 
-    if (!location.hash) location.hash = "#home";
+    if (!location.hash) location.hash = "#tools";
     window.addEventListener("hashchange", setViewClass);
 
     
@@ -279,3 +279,4 @@
   </script>
 </body>
 </html>
+
