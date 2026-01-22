@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+  
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>kgbb</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body class="view-home">
+  <div class="bg"></div>
+
+  <!-- top navigation -->
+  <header class="top">
+    <nav class="btn-row" aria-label="Navigation">
+      <a class="btn secondary nav-btn" href="#tools" data-view="tools">tools</a>
+      <a class="btn secondary nav-btn" href="#links" data-view="links">links</a>
+      <a class="btn secondary nav-btn" href="#key" data-view="key">unlock</a>
+
+    </nav>
+  </header>
+
+  <!-- pages -->
+  <main class="pages">
+
+    <!-- TOOLS -->
+    <section id="tools" class="page">
+      <div class="center">
+        <h1 class="title">tools</h1>
+        <p class="subtitle">utilities & experiments</p>
+
+        
+        <div id="toolsList" class="tool-grid" aria-live="polite"></div>
+
+      </div>
+    </section>
+
+    <!-- LINKS -->
+    <section id="links" class="page">
+      <div class="center">
+        <h1 class="subtitle">links</h1>
+        <p class="subtitle"></p>
+
+          <div class="contact-list">
+            <a href="https://github.com/Ropzx" target="_blank" rel="noreferrer" class="icon-link">
+              <i class="fa-brands fa-github"></i>
+              <span>github</span>
+            </a>
+          </div>
+      </div>
+    </section>
+
+    <!-- KEY -->
+    <section id="key" class="page">
+      <div class="center">
+        <h1 class="title">unlock</h1>
+        <p class="subtitle">paste token to generate key</p>
+
+        <div class="key-card">
+          <div class="key-head">
+            <div class="key-title glitch" data-text="verification required">verification required</div>
+            <div class="key-note" id="scaryMsg"></div>
+          </div>
+
+          <div class="key-row">
+            <input id="tokenInput" class="key-input" placeholder="paste token..." autocomplete="off" />
+            <button id="genBtn" class="key-btn">generate</button>
+          </div>
+
+          <div class="key-out" id="keyOut" style="display:none">
+            <div class="key-code" id="keyText"></div>
+            <button id="copyKeyBtn" class="key-btn ghost">copy</button>
+          </div>
+
+          <div class="key-status" id="keyStatus"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+ 
+    const TOOLS = [
+      {
+        id: "tool1",
+        name: "Py2Exe",
+        desc: "Tool to convert .py to .exe with a simple GUI.",
+        url: "tools/bin/Py2Exe.exe",
+        type: "download",
+        tooltip: "direct download link."
+      },
+      {
+        id: "tool2",
+        name: "tool2",
+        desc: "playlist randomizer",
+        url: "tools/bin/",
+        type: "download",
+        tooltip: "direct download link."
+      },
+      {
+        id: "tool3",
+        name: "Xyphera",
+        desc: "A visual desktop experiment that renders glitch effects and simulates a fake system crash screen. It interacts with desktop graphics to create chaotic behavior. Intended for demonstration only.",
+        url: "tools/bin/Xyphera.exe",
+        type: "download",
+        tooltip: "direct download link."
+      }
+    ];
+
+  
+    function setViewClass() {
+      const h = (location.hash || "#home").replace("#", "");
+
+      document.body.classList.remove("view-home","view-tools","view-links","view-key");
+      if (h === "tools") document.body.classList.add("view-tools");
+      else if (h === "links") document.body.classList.add("view-links");
+      else if (h === "key") document.body.classList.add("view-key");
+      else document.body.classList.add("view-home");
+
+
+    
+      document.querySelectorAll(".nav-btn").forEach(a => {
+        const view = a.getAttribute("data-view");
+        a.classList.toggle("active", view === h);
+      });
+
+      
+      document.body.classList.add("is-transitioning");
+      window.clearTimeout(window.__t);
+      window.__t = window.setTimeout(() => {
+        document.body.classList.remove("is-transitioning");
+      }, 260);
+    }
+
+    if (!location.hash) location.hash = "#home";
+    window.addEventListener("hashchange", setViewClass);
+
+    
+    function pill(label, value) {
+      const s = document.createElement("span");
+      s.className = "meta-pill";
+      s.appendChild(document.createTextNode(label + " "));
+
+      const b = document.createElement("b");
+      b.textContent = value;
+
+      s.appendChild(b);
+      return s;
+    }
+
+    function renderTools(){
+      const root = document.getElementById("toolsList");
+      if (!root) return;
+      root.innerHTML = "";
+
+      TOOLS.forEach(t => {
+        const card = document.createElement("div");
+        card.className = "tool-card";
+
+        const left = document.createElement("div");
+        left.className = "tool-info";
+
+       
+        const nameRow = document.createElement("div");
+        nameRow.className = "tool-topline";
+
+        const name = document.createElement("div");
+        name.className = "tool-name";
+        name.textContent = t.name;
+
+        const badges = document.createElement("div");
+        
+
+        nameRow.appendChild(name);
+        nameRow.appendChild(badges);
+
+        const desc = document.createElement("div");
+        desc.className = "tool-desc";
+        desc.textContent = t.desc;
+
+        const meta = document.createElement("div");
+        meta.className = "tool-meta";
+
+        left.appendChild(nameRow);
+        left.appendChild(desc);
+        left.appendChild(meta);
+
+        const action = document.createElement("a");
+        action.className = "download-btn" + (t.type === "source" ? " ghost" : "");
+        action.href = t.url;
+        action.setAttribute("data-tooltip", t.tooltip || "");
+        action.textContent = t.type === "source" ? "↗ source" : "⬇ download";
+
+        if (t.type === "source") {
+          action.target = "_blank";
+          action.rel = "noreferrer";
+        }
+
+        card.appendChild(left);
+        card.appendChild(action);
+        root.appendChild(card);
+      });
+    }
+        // --- key generator (must match your PyQt logic) ---
+    function makeKey(token){
+      let h = 2166136261;
+      for (let i=0;i<token.length;i++){
+        h ^= token.charCodeAt(i);
+        h = Math.imul(h, 16777619) >>> 0;
+      }
+      const part = h.toString(16).padStart(8,"0").toUpperCase();
+      return `KGBB-${part}-${part.split("").reverse().join("")}`;
+    }
+
+    function initKeyPage(){
+      const scaryEl = document.getElementById("scaryMsg");
+      const tokenEl = document.getElementById("tokenInput");
+      const genBtn = document.getElementById("genBtn");
+      const out = document.getElementById("keyOut");
+      const keyText = document.getElementById("keyText");
+      const copyBtn = document.getElementById("copyKeyBtn");
+      const status = document.getElementById("keyStatus");
+
+      if (!scaryEl || !tokenEl || !genBtn || !out || !keyText || !copyBtn || !status) return;
+
+      // typewriter message (scarier)
+      const scaryFull =
+    `CRITICAL ERROR: FILESYSTEM METADATA DAMAGE DETECTED.
+    Paste token to generate a session unlock key.`;
+
+      let i = 0;
+      scaryEl.textContent = "";
+      const tw = setInterval(() => {
+        i++;
+        scaryEl.textContent = scaryFull.slice(0, i);
+        if (i >= scaryFull.length) clearInterval(tw);
+      }, 14);
+
+      genBtn.onclick = () => {
+        const t = tokenEl.value.trim();
+        if (!t){
+          status.textContent = "enter a token";
+          status.classList.add("bad");
+          return;
+        }
+        status.classList.remove("bad");
+        const k = makeKey(t);
+        keyText.textContent = k;
+        out.style.display = "flex";
+        status.textContent = "key generated";
+      };
+
+      copyBtn.onclick = async () => {
+        const text = keyText.textContent || "";
+        if (!text) return;
+        try{
+          await navigator.clipboard.writeText(text);
+          status.classList.remove("bad");
+          status.textContent = "key copied";
+        }catch(e){
+          status.classList.add("bad");
+          status.textContent = "copy failed (clipboard blocked)";
+        }
+      };
+    }
+
+    initKeyPage();
+
+
+    
+    setViewClass();
+    renderTools();
+  </script>
+</body>
+</html>
