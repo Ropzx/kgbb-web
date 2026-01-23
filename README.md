@@ -3,7 +3,7 @@
 
 A minimal dark-themed personal website showcasing various tools, experiments, and downloads.
 
-🌐 **Live site:** https://ropzx.github.io/kgbb-web/
+🌐 **Live site:** https://kgbb.xyz
 
 ---
 
