@@ -18,8 +18,9 @@
   <header class="top">
     <nav class="btn-row" aria-label="Navigation">
       <a class="btn secondary nav-btn" href="#tools" data-view="tools">tools</a>
-      <a class="btn secondary nav-btn" href="#links" data-view="links">links</a>
       <a class="btn secondary nav-btn" href="#key" data-view="key">unlock</a>
+      <a class="btn secondary nav-btn" href="#links" data-view="links">links</a>
+      
 
     </nav>
   </header>
@@ -57,8 +58,8 @@
     <!-- KEY -->
     <section id="key" class="page">
       <div class="center">
-        <h1 class="title">unlock</h1>
-        <p class="subtitle">paste token to generate key</p>
+        <h1 class="subtitle">Unlock tool for Coreseal.exe</h1>
+      
 
         <div class="key-card">
           <div class="key-head">
@@ -97,9 +98,9 @@
       },
       {
         id: "tool2",
-        name: "tool2",
-        desc: "playlist randomizer",
-        url: "tools/bin/",
+        name: "Coreseal",
+        desc: "An educational simulation tool that visually demonstrates a system-lock scenario without impacting real data.",
+        url: "tools/bin/Coreseal.exe",
         type: "download",
         tooltip: "direct download link."
       },
@@ -119,8 +120,8 @@
 
       document.body.classList.remove("view-tools","view-links","view-key");
       if (h === "tools") document.body.classList.add("view-tools");
-      else if (h === "links") document.body.classList.add("view-links");
       else if (h === "key") document.body.classList.add("view-key");
+      else if (h === "links") document.body.classList.add("view-links");
       else document.body.classList.add("view-tools");
 
 
@@ -282,20 +283,6 @@
         }
       };
 
-      // Auto-paste if there's something in clipboard and field is empty
-      window.addEventListener('focus', async () => {
-        if (!tokenEl.value.trim()) {
-          try {
-            const clipboardText = await navigator.clipboard.readText();
-            // Check if it looks like a token (has hyphens and uppercase letters/numbers)
-            if (clipboardText && /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(clipboardText)) {
-              tokenEl.value = clipboardText;
-            }
-          } catch (e) {
-            // Clipboard access might be blocked, ignore
-          }
-        }
-      });
     }
 
     initKeyPage();
