@@ -32,8 +32,8 @@ The site currently features multiple tools, including:
   A visual desktop experiment that simulates glitch effects and fake system behavior  
   *(demonstration / visual only)*.
 
-- **Ransomware demo**  
-  A visual **token → key** verification used to showcase UI, logic flow, and animations.  
+- **Coreseal**  
+  Ransomware demo visual **token → key** verification used to showcase UI, logic flow, and animations.  
   This is a **simulation only** and does not perform any harmful actions.
 
 
