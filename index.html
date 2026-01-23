@@ -207,16 +207,21 @@
         root.appendChild(card);
       });
     }
-        // --- key generator (must match your PyQt logic) ---
+    
     function makeKey(token){
-      let h = 2166136261;
-      for (let i=0;i<token.length;i++){
-        h ^= token.charCodeAt(i);
-        h = Math.imul(h, 16777619) >>> 0;
+      // Clean token (remove hyphens and spaces for calculation) - MATCHES PYTHON
+      const cleanToken = token.replace(/-/g, '').replace(/\s/g, '').trim();
+
+      let h = 2166136261 >>> 0;
+      for (let i = 0; i < cleanToken.length; i++){
+        h ^= cleanToken.charCodeAt(i);
+        h = Math.imul(h, 16777619) >>> 0; // IMPORTANT: true 32-bit multiply
       }
+
       const part = h.toString(16).padStart(8,"0").toUpperCase();
       return `KGBB-${part}-${part.split("").reverse().join("")}`;
     }
+
 
     function initKeyPage(){
       const scaryEl = document.getElementById("scaryMsg");
@@ -229,10 +234,8 @@
 
       if (!scaryEl || !tokenEl || !genBtn || !out || !keyText || !copyBtn || !status) return;
 
-      // typewriter message (scarier)
-      const scaryFull =
-    `CRITICAL ERROR: FILESYSTEM METADATA DAMAGE DETECTED.
-    Paste token to generate a session unlock key.`;
+      // Typewriter message
+      const scaryFull = `CRITICAL ERROR: FILESYSTEM METADATA DAMAGE DETECTED.\nPaste token to generate a session unlock key.`;
 
       let i = 0;
       scaryEl.textContent = "";
@@ -241,6 +244,9 @@
         scaryEl.textContent = scaryFull.slice(0, i);
         if (i >= scaryFull.length) clearInterval(tw);
       }, 14);
+
+      // Auto-focus token input when on key page
+      tokenEl.focus();
 
       genBtn.onclick = () => {
         const t = tokenEl.value.trim();
@@ -253,8 +259,15 @@
         const k = makeKey(t);
         keyText.textContent = k;
         out.style.display = "flex";
-        status.textContent = "key generated";
+        status.textContent = "key generated - copy and paste into lock screen";
       };
+
+      // Also allow Enter key to generate
+      tokenEl.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          genBtn.click();
+        }
+      });
 
       copyBtn.onclick = async () => {
         const text = keyText.textContent || "";
@@ -262,16 +275,30 @@
         try{
           await navigator.clipboard.writeText(text);
           status.classList.remove("bad");
-          status.textContent = "key copied";
+          status.textContent = "key copied - paste into lock screen";
         }catch(e){
           status.classList.add("bad");
           status.textContent = "copy failed (clipboard blocked)";
         }
       };
+
+      // Auto-paste if there's something in clipboard and field is empty
+      window.addEventListener('focus', async () => {
+        if (!tokenEl.value.trim()) {
+          try {
+            const clipboardText = await navigator.clipboard.readText();
+            // Check if it looks like a token (has hyphens and uppercase letters/numbers)
+            if (clipboardText && /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(clipboardText)) {
+              tokenEl.value = clipboardText;
+            }
+          } catch (e) {
+            // Clipboard access might be blocked, ignore
+          }
+        }
+      });
     }
 
     initKeyPage();
-
 
     
     setViewClass();
