@@ -111,6 +111,14 @@
         url: "tools/bin/Xyphera.exe",
         type: "download",
         tooltip: "direct download link."
+      },
+      {
+        id: "tool4",
+        name: "Skeleton",
+        desc: "Mi Bombo skeleton banging shield virus type shi program. NOT HARMFUL",
+        url: "tools/bin/Skeleton.exe",
+        type: "download",
+        tooltip: "direct download link."
       }
     ];
 
@@ -210,13 +218,13 @@
     }
     
     function makeKey(token){
-      // Clean token (remove hyphens and spaces for calculation) - MATCHES PYTHON
+      
       const cleanToken = token.replace(/-/g, '').replace(/\s/g, '').trim();
 
       let h = 2166136261 >>> 0;
       for (let i = 0; i < cleanToken.length; i++){
         h ^= cleanToken.charCodeAt(i);
-        h = Math.imul(h, 16777619) >>> 0; // IMPORTANT: true 32-bit multiply
+        h = Math.imul(h, 16777619) >>> 0; 
       }
 
       const part = h.toString(16).padStart(8,"0").toUpperCase();
