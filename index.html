@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en" class="dark-fantasy">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>pulkson</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="view-tools">
+  <div class="bg"></div>
+  
+  <!-- Particle overlay -->
+  <div class="particles" id="particles"></div>
+  
+  <!-- Rune decorations -->
+  <div class="rune-decoration rune-tl">ᚱ</div>
+  <div class="rune-decoration rune-tr">ᚢ</div>
+  <div class="rune-decoration rune-bl">ᚾ</div>
+  <div class="rune-decoration rune-br">ᛖ</div>
+
+  <!-- top navigation -->
+  <header class="top">
+    <nav class="btn-row" aria-label="Navigation">
+      <a class="btn secondary nav-btn active" href="#tools" data-view="tools">
+        <span class="nav-icon">⚒</span> tools
+      </a>
+      <a class="btn secondary nav-btn" href="#key" data-view="key">
+        <span class="nav-icon">⚔</span> unlock
+      </a>
+      <a class="btn secondary nav-btn" href="#links" data-view="links">
+        <span class="nav-icon">⛓</span> links
+      </a>
+    </nav>
+  </header>
+  
+  <div class="container">
+
+  <!-- pages -->
+  <main class="pages">
+
+    <!-- TOOLS -->
+    <section id="tools" class="page active-page">
+      <div class="center">
+        <div class="section-header">
+          <div class="section-rune">⚔</div>
+          <h1 class="title glitch-text" data-text="Tools">Tools</h1>
+          <p class="subtitle">utilities & experiments</p>
+        </div>
+        
+        <div id="toolsList" class="tool-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- LINKS -->
+    <section id="links" class="page">
+      <div class="center">
+        <div class="section-header">
+          <div class="section-rune">⛓</div>
+          <h1 class="title glitch-text" data-text="Links">Links</h1>
+        </div>
+
+        <div class="contact-list">
+          <a href="https://github.com/Ropzx" target="_blank" rel="noreferrer" class="icon-link">
+            <div class="link-icon-wrapper">
+              <i class="fa-brands fa-github"></i>
+            </div>
+            <span>github</span>
+            <span class="link-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- KEY -->
+    <section id="key" class="page">
+      <div class="center">
+        <div class="section-header">
+          <div class="section-rune">🗝</div>
+          <h1 class="title glitch-text" data-text="Unlocker">Unlocker</h1>
+          <p class="subtitle">generate your key</p>
+        </div>
+
+        <div class="key-card">
+          <div class="key-head">
+            <div class="key-title glitch" data-text="verification required">verification required</div>
+            <div class="key-note" id="scaryMsg"></div>
+          </div>
+
+          <div class="key-row">
+            <input id="tokenInput" class="key-input" placeholder="paste token..." autocomplete="off" />
+            <button id="genBtn" class="key-btn" type="button">
+              <span class="btn-content">
+                <span class="btn-rune">⚡</span>
+                generate
+              </span>
+            </button>
+          </div>
+
+          <div class="key-out" id="keyOut" style="display:none">
+            <div class="key-code" id="keyText"></div>
+            <button id="copyKeyBtn" class="key-btn ghost" type="button">
+              <span class="btn-content">
+                <span class="btn-rune">📋</span>
+                copy
+              </span>
+            </button>
+          </div>
+
+          <div class="key-status" id="keyStatus"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  
+  <!-- Simple footer -->
+  <footer>
+    <div class="rule"></div>
+  </footer>
+  
+  </div>
+
+  <script>
+    const TOOLS = [
+      {
+        id: "tool1",
+        name: "Py2Exe",
+        desc: "Forge Python scripts into executable artifacts with a simple GUI.",
+        url: "tools/bin/Py2Exe.exe",
+        type: "download",
+        tooltip: "direct download link"
+      },
+      {
+        id: "tool2",
+        name: "Coreseal",
+        desc: "A system-lock demonstration showcasing dark UI and verification flows.",
+        url: "tools/bin/Coreseal.exe",
+        type: "download",
+        tooltip: "direct download link"
+      },
+      {
+        id: "tool3",
+        name: "Xyphera",
+        desc: "Visual glitch experiment simulating corrupted system behavior and effects.",
+        url: "tools/bin/Xyphera.exe",
+        type: "download",
+        tooltip: "direct download link"
+      },
+      {
+        id: "tool4",
+        name: "Skeleton",
+        desc: "Mi Bombo skeleton banging shield virus type shi program. NOT HARMFUL",
+        url: "tools/bin/skeleton.exe",
+        type: "download",
+        tooltip: "direct download link"
+      }
+    ];
+
+    
+    function setViewClass() {
+      const h = (location.hash || "#tools").replace("#", "");
+      
+      
+      document.body.classList.remove("view-tools","view-links","view-key");
+      if (h === "tools") document.body.classList.add("view-tools");
+      else if (h === "key") document.body.classList.add("view-key");
+      else if (h === "links") document.body.classList.add("view-links");
+      else document.body.classList.add("view-tools");
+
+      
+      document.querySelectorAll(".nav-btn").forEach(a => {
+        const view = a.getAttribute("data-view");
+        a.classList.toggle("active", view === h);
+      });
+
+      
+      document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active-page");
+        page.style.display = "none";
+        page.style.opacity = "0";
+        page.style.transform = "translateY(12px)";
+        page.style.pointerEvents = "none";
+      });
+
+      const targetPage = document.getElementById(h);
+      if (targetPage) {
+        targetPage.style.display = "block";
+        targetPage.style.pointerEvents = "auto";
+        
+        targetPage.offsetHeight;
+        targetPage.classList.add("active-page");
+        targetPage.style.opacity = "1";
+        targetPage.style.transform = "translateY(0)";
+      }
+
+      document.body.classList.add("is-transitioning");
+      window.clearTimeout(window.__t);
+      window.__t = window.setTimeout(() => {
+        document.body.classList.remove("is-transitioning");
+      }, 280);
+      
+      
+      if (h === "key") {
+        setTimeout(() => {
+          initKeyPage();
+          const input = document.getElementById("tokenInput");
+          if (input) {
+            input.focus();
+            console.log("Token input focused");
+          }
+        }, 350);
+      }
+    }
+
+    
+    if (!location.hash) location.hash = "#tools";
+    window.addEventListener("hashchange", setViewClass);
+    
+    
+    window.addEventListener("DOMContentLoaded", () => {
+      setViewClass();
+    });
+
+    
+    function renderTools(){
+      const root = document.getElementById("toolsList");
+      if (!root) return;
+      root.innerHTML = "";
+
+      TOOLS.forEach((t, index) => {
+        const card = document.createElement("div");
+        card.className = "tool-card";
+        card.style.setProperty("--card-index", index);
+
+        const left = document.createElement("div");
+        left.className = "tool-info";
+
+        const nameRow = document.createElement("div");
+        nameRow.className = "tool-topline";
+
+        const name = document.createElement("div");
+        name.className = "tool-name";
+        name.textContent = t.name;
+
+        nameRow.appendChild(name);
+
+        const desc = document.createElement("div");
+        desc.className = "tool-desc";
+        desc.textContent = t.desc;
+
+        left.appendChild(nameRow);
+        left.appendChild(desc);
+
+        const actionWrapper = document.createElement("div");
+        actionWrapper.className = "tool-action-wrapper";
+
+        const action = document.createElement("a");
+        action.className = "download-btn" + (t.type === "source" ? " ghost" : "");
+        action.href = t.url;
+        action.setAttribute("data-tooltip", t.tooltip || "");
+        
+        if (t.type === "source") {
+          action.innerHTML = '<span class="btn-content"><span class="btn-rune">↗</span> source</span>';
+          action.target = "_blank";
+          action.rel = "noreferrer";
+        } else {
+          action.innerHTML = '<span class="btn-content"><span class="btn-rune">⬇</span> download</span>';
+        }
+
+        actionWrapper.appendChild(action);
+        card.appendChild(left);
+        card.appendChild(actionWrapper);
+        root.appendChild(card);
+      });
+    }
+    
+    
+    function makeKey(token){
+      const cleanToken = token.replace(/-/g, '').replace(/\s/g, '').trim();
+      let h = 2166136261 >>> 0;
+      for (let i = 0; i < cleanToken.length; i++){
+        h ^= cleanToken.charCodeAt(i);
+        h = Math.imul(h, 16777619) >>> 0;
+      }
+      const part = h.toString(16).padStart(8,"0").toUpperCase();
+      return `KGBB-${part}-${part.split("").reverse().join("")}`;
+    }
+
+    let keyInitDone = false;
+    
+    function initKeyPage(){
+      const scaryEl = document.getElementById("scaryMsg");
+      const tokenEl = document.getElementById("tokenInput");
+      const genBtn = document.getElementById("genBtn");
+      const out = document.getElementById("keyOut");
+      const keyText = document.getElementById("keyText");
+      const copyBtn = document.getElementById("copyKeyBtn");
+      const status = document.getElementById("keyStatus");
+
+      if (!scaryEl || !tokenEl || !genBtn || !out || !keyText || !copyBtn || !status) {
+        console.log("Key page elements missing");
+        return;
+      }
+
+      console.log("Initializing key page...");
+
+      
+      if (!keyInitDone) {
+        const scaryFull = "CRITICAL ERROR: FILESYSTEM METADATA DAMAGE DETECTED.\nPaste token to generate a session unlock key.";
+        let i = 0;
+        scaryEl.textContent = "";
+        const tw = setInterval(() => {
+          i++;
+          scaryEl.textContent = scaryFull.slice(0, i);
+          if (i >= scaryFull.length) clearInterval(tw);
+        }, 14);
+        keyInitDone = true;
+      }
+
+      
+      const newGenBtn = genBtn.cloneNode(true);
+      genBtn.parentNode.replaceChild(newGenBtn, genBtn);
+      
+      const newCopyBtn = copyBtn.cloneNode(true);
+      copyBtn.parentNode.replaceChild(newCopyBtn, copyBtn);
+
+      
+      newGenBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Generate clicked!");
+        
+        const t = tokenEl.value.trim();
+        if (!t){
+          status.textContent = "⛧ enter a token to begin the ritual";
+          status.classList.add("bad");
+          tokenEl.style.animation = "none";
+          tokenEl.offsetHeight;
+          tokenEl.style.animation = "shake 0.4s ease";
+          return;
+        }
+        
+        status.classList.remove("bad");
+        const k = makeKey(t);
+        keyText.textContent = k;
+        out.style.display = "flex";
+        out.style.animation = "none";
+        out.offsetHeight;
+        out.style.animation = "fadeInUp 0.3s ease";
+        status.textContent = "✦ key forged — copy and return to the lock screen";
+        status.style.color = "rgba(140,255,170,.85)";
+      });
+
+      
+      tokenEl.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          newGenBtn.click();
+        }
+      });
+
+      
+      newCopyBtn.addEventListener("click", async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Copy clicked!");
+        
+        const text = keyText.textContent || "";
+        if (!text) return;
+        try{
+          await navigator.clipboard.writeText(text);
+          status.classList.remove("bad");
+          status.textContent = "✦ key copied to clipboard — use it wisely";
+          status.style.color = "rgba(140,255,170,.85)";
+          newCopyBtn.style.background = "rgba(140,255,170,.2)";
+          setTimeout(() => {
+            newCopyBtn.style.background = "";
+          }, 300);
+        }catch(e){
+          status.classList.add("bad");
+          status.textContent = "⛧ copy failed — clipboard blocked by the void";
+        }
+      });
+
+      
+      tokenEl.disabled = false;
+      tokenEl.style.pointerEvents = "auto";
+      tokenEl.focus();
+      console.log("Key page ready - input focused:", document.activeElement === tokenEl);
+    }
+
+    
+    function createParticles() {
+      const container = document.getElementById("particles");
+      if (!container) return;
+      
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        particle.style.left = Math.random() * 100 + "%";
+        particle.style.top = Math.random() * 100 + "%";
+        particle.style.animationDelay = Math.random() * 8 + "s";
+        particle.style.animationDuration = (Math.random() * 4 + 2) + "s";
+        particle.style.width = particle.style.height = (Math.random() * 3 + 1) + "px";
+        container.appendChild(particle);
+      }
+    }
+
+    
+    window.addEventListener("DOMContentLoaded", function() {
+      renderTools();
+      createParticles();
+      setViewClass(); 
+    });
+  </script>
+</body>
+</html>
