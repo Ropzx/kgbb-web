@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>World Cup 2026 Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f0;
+            min-height: 100vh;
+        }
+
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .auth-container h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .auth-container p {
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s;
+            color: #111827;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #111827;
+            background: #ffffff;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: #111827;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .auth-btn:hover {
+            background: #1f2937;
+        }
+
+        .auth-switch {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .auth-switch span {
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .auth-error {
+            color: #dc2626;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* App Container */
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .app.hidden {
+            display: none;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #f9fafb;
+            border-right: 1px solid #e5e7eb;
+            padding: 32px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo .trophy {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+
+        .logo h1 {
+            font-size: 1.3em;
+            color: #111827;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .logo .hosts {
+            font-size: 0.7em;
+            color: #6b7280;
+        }
+
+        /* User Section */
+        .user-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 32px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .user-info {
+            text-align: center;
+        }
+
+        .user-name {
+            color: #111827;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .admin-badge {
+            background: #f59e0b;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Sidebar Tabs */
+        .sidebar-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4b5563;
+            width: 100%;
+            text-align: left;
+        }
+
+        .tab-btn:hover {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .tab-btn.active {
+            background: #111827;
+            color: white;
+        }
+
+        .count-badge {
+            background: #e5e7eb;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 0.7em;
+            margin-left: auto;
+            color: #4b5563;
+        }
+
+        .tab-btn.active .count-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px 40px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid #e5e7eb;
+        }
+
+        .time-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85em;
+            color: #4b5563;
+        }
+
+        .time-info span {
+            background: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .refresh-note {
+            font-size: 0.75em;
+            color: #9ca3af;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .matches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .match-card, .featured-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+
+        .match-card:hover, .featured-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .featured-header {
+            background: #f9fafb;
+            padding: 12px 16px;
+            font-size: 0.8em;
+            color: #4b5563;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .featured-header.live {
+            background: #dc2626;
+            color: white;
+        }
+
+        .match-header {
+            background: #f9fafb;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .match-round {
+            font-weight: 500;
+            color: #6b7280;
+            font-size: 0.8em;
+        }
+
+        .match-group {
+            background: #e5e7eb;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            color: #4b5563;
+        }
+
+        .match-body {
+            padding: 20px;
+        }
+
+        .match-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .team {
+            text-align: center;
+            flex: 1;
+        }
+
+        .team-flag {
+            width: 48px;
+            height: 36px;
+            margin: 0 auto 10px;
+            display: block;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .team-name {
+            font-size: 0.95em;
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .team-score {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #111827;
+            margin-top: 8px;
+        }
+
+        .vs {
+            font-size: 1em;
+            color: #9ca3af;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+
+        .match-info {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .match-info div {
+            color: #4b5563;
+            font-size: 0.85em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .status-live { background: #dc2626; color: white; animation: pulse 1.5s infinite; }
+        .status-starting { background: #f59e0b; color: white; }
+        .status-upcoming { background: #10b981; color: white; }
+        .status-finished { background: #3b82f6; color: white; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Prediction Styles */
+        .prediction-box {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .prediction-title {
+            font-size: 0.7em;
+            color: #6b7280;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .score-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .score-input {
+            text-align: center;
+            width: 60px;
+            padding: 8px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            color: #111827;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .score-input:focus {
+            outline: none;
+            border-color: #111827;
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 8px;
+            background: #111827;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .predict-btn:hover:not(:disabled) {
+            background: #1f2937;
+        }
+
+        .predict-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .prediction-made {
+            background: #10b981;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.75em;
+            color: white;
+            font-weight: 500;
+        }
+
+        .prediction-disabled {
+            background: #e5e7eb;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.75em;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .edit-link {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.7em;
+            cursor: pointer;
+            text-decoration: underline;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .edit-link:hover {
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 12px;
+            color: #9ca3af;
+            border: 1px solid #e5e7eb;
+        }
+
+        .home-welcome {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .home-welcome h2 {
+            color: #111827;
+            margin-bottom: 8px;
+            font-size: 1.3em;
+            font-weight: 500;
+        }
+
+        .home-welcome p {
+            color: #6b7280;
+            font-size: 0.85em;
+        }
+
+        .section-title {
+            color: #6b7280;
+            font-size: 0.8em;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            letter-spacing: 0.5px;
+        }
+
+        /* Leaderboard Table */
+        .leaderboard-table {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .leaderboard-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            background: #f9fafb;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #111827;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .leaderboard-table td {
+            padding: 12px 16px;
+            color: #4b5563;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .leaderboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .rank-1 {
+            background: #fef3c7;
+            font-weight: bold;
+            color: #d97706;
+        }
+
+        .goals-list {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .goals-title {
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-size: 0.75em;
+        }
+
+        .goals-team {
+            margin-bottom: 4px;
+        }
+
+        .goals-team-name {
+            font-weight: 600;
+            color: #111827;
+            font-size: 0.8em;
+        }
+
+        .goal-item {
+            font-size: 0.8em;
+            color: #4b5563;
+            margin-left: 12px;
+            margin-top: 2px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #111827;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show { opacity: 1; }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 12px;
+            }
+            .logo h1, .logo .hosts, .tab-btn span:not(.count-badge) {
+                display: none;
+            }
+            .tab-btn {
+                justify-content: center;
+                padding: 12px;
+            }
+            .tab-btn .count-badge {
+                margin-left: 0;
+            }
+            .main-content {
+                margin-left: 80px;
+                padding: 20px;
+            }
+            .matches-grid, .featured-grid {
+                grid-template-columns: 1fr;
+            }
+            .team-flag {
+                width: 40px;
+                height: 30px;
+            }
+            .leaderboard-table {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Overlay -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-container">
+            <div style="font-size: 48px; text-align: center; margin-bottom: 16px;">🏆</div>
+            <h2>World Cup 2026</h2>
+            <p>Login or register to continue</p>
+            <div id="authForm">
+                <input type="text" id="authUsername" class="auth-input" placeholder="Username">
+                <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+                <div id="authError" class="auth-error"></div>
+                <button class="auth-btn" onclick="handleAuth()">Login</button>
+                <div class="auth-switch" onclick="toggleAuthMode()">
+                    Don't have an account? <span>Register</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app hidden">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="trophy">🏆</div>
+                <h1>FIFA World Cup 2026</h1>
+            </div>
+
+            <div class="user-section" id="userSection">
+                <div id="userInfo"></div>
+            </div>
+
+            <div class="sidebar-tabs">
+                <button class="tab-btn home active" onclick="switchTab('home')">🏠 HOME <span class="count-badge">5</span></button>
+                <button class="tab-btn live" onclick="switchTab('live')">🔴 LIVE <span id="liveCount" class="count-badge">0</span></button>
+                <button class="tab-btn upcoming" onclick="switchTab('upcoming')">🟢 UPCOMING <span id="upcomingCount" class="count-badge">0</span></button>
+                <button class="tab-btn past" onclick="switchTab('past')">🔵 PAST <span id="pastCount" class="count-badge">0</span></button>
+                <button class="tab-btn leaderboard" onclick="switchTab('leaderboard')">🏆 LEADERBOARD</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="time-info">
+                    <span id="currentTime">Loading...</span>
+                </div>
+            </div>
+
+            <div id="homeTab" class="tab-content active">
+                <div class="home-welcome" id="welcomeMessage">
+                </div>
+                <div class="section-title">⏰ NEXT MATCHES</div>
+                <div class="featured-grid" id="featuredMatches"></div>
+            </div>
+
+            <div id="liveTab" class="tab-content">
+                <div class="matches-grid" id="liveMatches"></div>
+            </div>
+
+            <div id="upcomingTab" class="tab-content">
+                <div class="matches-grid" id="upcomingMatches"></div>
+            </div>
+
+            <div id="pastTab" class="tab-content">
+                <div class="matches-grid" id="pastMatches"></div>
+            </div>
+
+            <div id="leaderboardTab" class="tab-content">
+                <div class="home-welcome">
+                    <h2>🏆 Leaderboard</h2>
+                </div>
+                <div class="leaderboard-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Username</th>
+                                <th>Total Points</th>
+                                <th>Exact Scores</th>
+                                <th>Correct Results</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody">
+                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let allMatches = [];
+        let liveMatches = [];
+        let upcomingMatches = [];
+        let pastMatches = [];
+        let currentUser = null;
+        let userPredictions = {};
+        let isAdmin = false;
+        let isLoginMode = true;
+
+        
+        function getCurrentEstoniaTime() {
+            return new Date();
+        }
+
+        function parseMatchTime(match) {
+            
+            const utcDate = new Date(match.utc);
+            
+            return utcDate;
+        }
+
+        function getMatchStatus(match, matchTime) {
+            const now = getCurrentEstoniaTime();
+            const diffMinutes = (matchTime - now) / 60000;
+
+            
+            if (match.team1 === 'France' && match.team2 === 'Senegal') {
+                console.log('France vs Senegal:', {
+                    matchTime: matchTime.toISOString(),
+                    now: now.toISOString(),
+                    diffMinutes: diffMinutes,
+                    status: match.score && match.score.ft ? 'finished' : 
+                            (diffMinutes > 30 ? 'upcoming' : 
+                             (diffMinutes > 0 ? 'starting' : 
+                              (diffMinutes <= 0 && diffMinutes >= -180 ? 'live' : 'finished')))
+                });
+            }
+
+            if (match.score && match.score.ft) return "finished";
+
+            if (diffMinutes > 30) return "upcoming";
+            if (diffMinutes > 0) return "starting";
+            if (diffMinutes <= 0 && diffMinutes >= -180) return "live";
+
+            return "finished";
+        }
+
+        function formatEstoniaTime(date) {
+            return new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Europe/Tallinn',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date).replace(",", " at");
+        }
+
+        function updateTimeDisplay() {
+            const now = getCurrentEstoniaTime();
+            document.getElementById('currentTime').innerHTML = "🕐 " + formatEstoniaTime(now);
+        }
+
+        
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+
+            const btn = document.querySelector('#authForm .auth-btn');
+            const switchBtn = document.querySelector('#authForm .auth-switch');
+
+            if (isLoginMode) {
+                btn.textContent = 'Login';
+                switchBtn.innerHTML = `Don't have an account? <span>Register</span>`;
+            } else {
+                btn.textContent = 'Register';
+                switchBtn.innerHTML = `Already have an account? <span>Login</span>`;
+            }
+
+            document.getElementById('authError').textContent = '';
+        }
+
+        async function handleAuth() {
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value;
+            
+            if (!username || !password) {
+                document.getElementById('authError').textContent = 'Please enter username and password';
+                return;
+            }
+            
+            if (isLoginMode) {
+                await login();
+            } else {
+                await register();
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value;
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    currentUser = { username: data.username };
+                    isAdmin = data.is_admin || false;
+                    await loadPredictions();
+                    document.getElementById('authOverlay').classList.add('hidden');
+                    document.getElementById('app').classList.remove('hidden');
+                    updateUserUI();
+                    fetchData();
+                    loadLeaderboard();
+                    showToast(`Welcome ${username}!`);
+                } else {
+                    document.getElementById('authError').textContent = data.error;
+                }
+            } catch (error) {
+                document.getElementById('authError').textContent = 'Connection error. Make sure server is running.';
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value;
+
+            if (username.length < 3) {
+                document.getElementById('authError').textContent = 'Username must be at least 3 characters';
+                return;
+            }
+
+            if (password.length < 3) {
+                document.getElementById('authError').textContent = 'Password must be at least 3 characters';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+
+                    
+                    const loginRes = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const loginData = await loginRes.json();
+
+                    if (loginRes.ok) {
+                        currentUser = { username: loginData.username };
+                        isAdmin = loginData.is_admin || false;
+
+                        await loadPredictions();
+
+                        document.getElementById('authOverlay').classList.add('hidden');
+                        document.getElementById('app').classList.remove('hidden');
+
+                        updateUserUI();
+                        fetchData();
+                        loadLeaderboard();
+
+                        showToast(`Welcome ${username}!`);
+                    }
+
+                } else {
+                    document.getElementById('authError').textContent = data.error;
+                }
+            } catch (error) {
+                document.getElementById('authError').textContent = 'Connection error';
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            currentUser = null;
+            userPredictions = {};
+            isAdmin = false;
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('authOverlay').classList.remove('hidden');
+            document.getElementById('authUsername').value = '';
+            document.getElementById('authPassword').value = '';
+            isLoginMode = true;
+            toggleAuthMode();
+            showToast('Logged out');
+        }
+
+        function showToast(msg, isErr) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = isErr ? '#dc2626' : '#111827';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const res = await fetch('/api/leaderboard');
+                const data = await res.json();
+                const tbody = document.getElementById('leaderboardBody');
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No predictions yet</td></tr>';
+                } else {
+                    tbody.innerHTML = data.map((user, index) => `
+                        <tr class="${index === 0 ? 'rank-1' : ''}">
+                            <td>${index + 1}</td>
+                            <td>${user.username}</td>
+                            <td><strong>${user.total_points}</strong></td>
+                            <td>${user.correct_scores}</td>
+                            <td>${user.correct_results}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        
+        function getFlagUrl(countryName) {
+            const flagMap = {
+                "Mexico": "mx", "USA": "us", "Canada": "ca", "South Africa": "za",
+                "South Korea": "kr", "Czech Republic": "cz", "Spain": "es", "Cape Verde": "cv",
+                "Argentina": "ar", "France": "fr", "Germany": "de", "Brazil": "br",
+                "England": "gb", "Portugal": "pt", "Netherlands": "nl", "Belgium": "be",
+                "Croatia": "hr", "Uruguay": "uy", "Colombia": "co", "Chile": "cl",
+                "Japan": "jp", "Australia": "au", "Nigeria": "ng", "Senegal": "sn",
+                "Morocco": "ma", "Tunisia": "tn", "Egypt": "eg", "Saudi Arabia": "sa",
+                "Iran": "ir", "Poland": "pl", "Denmark": "dk", "Switzerland": "ch",
+                "Sweden": "se", "Italy": "it", "Austria": "at", "Scotland": "gb-sct",
+                "Serbia": "rs", "Turkey": "tr", "Greece": "gr", "Norway": "no",
+                "Iraq": "iq", "Jordan": "jo", "Algeria": "dz", "Uzbekistan": "uz",
+                "DR Congo": "cd", "Ghana": "gh", "Panama": "pa", "Ivory Coast": "ci",
+                "Ecuador": "ec", "Curaçao": "cw", "Paraguay": "py", "Haiti": "ht",
+                "New Zealand": "nz", "Qatar": "qa", "Bosnia & Herzegovina": "ba"
+            };
+            const code = flagMap[countryName]?.toLowerCase();
+            return code ? `https://flagpedia.net/data/flags/icon/72x54/${code}.png` : '';
+        }
+
+        async function loadPredictions() {
+            if (!currentUser) return;
+            try {
+                const res = await fetch('/api/predictions');
+                if (res.ok) userPredictions = await res.json();
+            } catch(e) { console.error(e); }
+        }
+
+        async function savePrediction(matchId, s1, s2) {
+            if (!currentUser) return false;
+            try {
+                const res = await fetch('/api/predictions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ match_id: matchId, team1_score: s1, team2_score: s2 })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    userPredictions[matchId] = { team1Score: s1, team2Score: s2, points: 0 };
+                    showToast('Prediction saved!');
+                    return true;
+                } else if (data.error) {
+                    showToast(data.error, true);
+                    return false;
+                }
+            } catch(e) { console.error(e); }
+            return false;
+        }
+
+        async function deletePrediction(matchId) {
+            if (!currentUser) return;
+            try {
+                await fetch('/api/predictions', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ match_id: matchId }) });
+                delete userPredictions[matchId];
+            } catch(e) { console.error(e); }
+        }
+
+        function getPrediction(matchId) { return userPredictions[matchId]; }
+
+        function updateUserUI() {
+            const container = document.getElementById('userInfo');
+            const welcome = document.getElementById('welcomeMessage');
+            if (currentUser) {
+                const adminBadge = isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
+                container.innerHTML = `<div class="user-info"><div class="user-name">👤 ${currentUser.username} ${adminBadge}</div><button class="logout-btn" onclick="logout()">Logout</button></div>`;
+                if (welcome) welcome.innerHTML = `<h2>🏆 Welcome ${currentUser.username}!</h2>`;
+            }
+        }
+
+        function isBettingDisabled(match, status) {
+            return status === 'live';
+        }
+
+        function renderCard(match, isFeatured = false) {
+            const matchTime = parseMatchTime(match);
+            const status = getMatchStatus(match, matchTime);
+            const score = match.score?.ft || null;
+            const statusText = status.toUpperCase();
+            
+            
+            function renderGoals(goals, teamName) {
+                if (!goals || goals.length === 0) return '';
+                let html = `<div class="goals-team"><span style="font-weight: 600; color: #111827; font-size: 0.8em;">${teamName}:</span></div>`;
+                goals.forEach(goal => {
+                    const penalty = goal.penalty ? ' (P)' : '';
+                    const og = goal.own_goal ? ' (OG)' : '';
+                    const minute = goal.minute || '?';
+                    html += `<div class="goal-item" style="font-size: 0.8em; color: #4b5563; margin-left: 12px; margin-top: 2px;">• ${goal.name}${penalty}${og}  ${minute}'</div>`;
+                });
+                return html;
+            }
+            
+            if (isFeatured) {
+                const matchId = match.id;
+                const pred = getPrediction(matchId);
+                const now = getCurrentEstoniaTime();
+                const diffMin = Math.round((matchTime - now) / 60000);
+                
+                let timeShow = '';
+                let headerClass = '';
+                
+                if (status === 'live') {
+                    timeShow = '🔴 LIVE NOW';
+                    headerClass = 'live';
+                } else if (status === 'starting') {
+                    timeShow = '🟡 STARTING SOON';
+                } else if (diffMin > 1440) {
+                    timeShow = `📅 ${Math.round(diffMin/1440)} days`;
+                } else if (diffMin > 60) {
+                    timeShow = `⏰ ${Math.round(diffMin/60)}h`;
+                } else {
+                    timeShow = `⏰ ${diffMin}m`;
+                }
+                
+                
+                const hasGoals = (match.goals1 && match.goals1.length > 0) || (match.goals2 && match.goals2.length > 0);
+                let goalsHtml = '';
+                if (hasGoals && (status === 'live' || status === 'finished')) {
+                    goalsHtml = `<div class="goals-list"><div class="goals-title">⚽ GOALS</div>`;
+                    if (match.goals1 && match.goals1.length > 0) {
+                        goalsHtml += renderGoals(match.goals1, match.team1);
+                    }
+                    if (match.goals2 && match.goals2.length > 0) {
+                        goalsHtml += renderGoals(match.goals2, match.team2);
+                    }
+                    goalsHtml += `</div>`;
+                }
+                
+                let predHtml = '';
+                
+                if (isBettingDisabled(match, status)) {
+                    predHtml = `<div class="prediction-disabled">⛔ Betting closed</div>`;
+                } else if (!currentUser) {
+                    predHtml = `<div class="prediction-box"><button class="predict-btn" onclick="showLogin()">🔐 Login to Predict</button></div>`;
+                } else if (pred) {
+                    const pointsBadge = pred.points > 0 ? `<div style="font-size: 10px; margin-top: 4px;">🏆 +${pred.points} pts</div>` : '';
+                    predHtml = `<div class="prediction-made">🎯 ${pred.team1Score} - ${pred.team2Score}${pointsBadge}<div><span class="edit-link" onclick="editPrediction('${matchId}')">✏️ Edit</span></div></div>`;
+                } else {
+                    predHtml = `<div class="prediction-box"><div class="score-inputs"><input type="text" id="s1_${matchId}" class="score-input" placeholder="0" maxlength="2" value="0"><span class="vs-small">VS</span><input type="text" id="s2_${matchId}" class="score-input" placeholder="0" maxlength="2" value="0"></div><button class="predict-btn" onclick="lockPrediction('${matchId}', '${match.team1}', '${match.team2}')">🔒 Lock Prediction</button></div>`;
+                }
+                
+                return `<div class="featured-card"><div class="featured-header ${headerClass}"><span>${timeShow}</span><span>${formatEstoniaTime(matchTime)}</span></div><div class="match-body"><div class="match-teams"><div class="team">${getFlagUrl(match.team1) ? `<img src="${getFlagUrl(match.team1)}" class="team-flag">` : ''}<div class="team-name">${match.team1}</div>${score ? `<div class="team-score">${score[0]}</div>` : ''}</div><div class="vs">VS</div><div class="team">${getFlagUrl(match.team2) ? `<img src="${getFlagUrl(match.team2)}" class="team-flag">` : ''}<div class="team-name">${match.team2}</div>${score ? `<div class="team-score">${score[1]}</div>` : ''}</div></div>${goalsHtml}${predHtml}</div></div>`;
+            }
+            
+            
+            const pred = getPrediction(match.id);
+            const pointsBadge = pred && pred.points > 0 ? `<div style="font-size: 10px; margin-top: 4px;">🏆 +${pred.points} pts</div>` : '';
+            
+            
+            const hasGoals = (match.goals1 && match.goals1.length > 0) || (match.goals2 && match.goals2.length > 0);
+            let goalsHtml = '';
+            if (hasGoals && (status === 'live' || status === 'finished')) {
+                goalsHtml = `<div class="goals-list"><div class="goals-title">⚽ GOALS</div>`;
+                if (match.goals1 && match.goals1.length > 0) {
+                    goalsHtml += `<div class="goals-team"><span style="font-weight: 600; color: #111827; font-size: 0.8em;">${match.team1}:</span></div>`;
+                    match.goals1.forEach(goal => {
+                        const penalty = goal.penalty ? ' (P)' : '';
+                        const og = goal.own_goal ? ' (OG)' : '';
+                        const minute = goal.minute || '?';
+                        goalsHtml += `<div class="goal-item" style="font-size: 0.8em; color: #4b5563; margin-left: 12px; margin-top: 2px;">• ${goal.name}${penalty}${og}  ${minute}'</div>`;
+                    });
+                }
+                if (match.goals2 && match.goals2.length > 0) {
+                    goalsHtml += `<div class="goals-team" style="margin-top: 6px;"><span style="font-weight: 600; color: #111827; font-size: 0.8em;">${match.team2}:</span></div>`;
+                    match.goals2.forEach(goal => {
+                        const penalty = goal.penalty ? ' (P)' : '';
+                        const og = goal.own_goal ? ' (OG)' : '';
+                        const minute = goal.minute || '?';
+                        goalsHtml += `<div class="goal-item" style="font-size: 0.8em; color: #4b5563; margin-left: 12px; margin-top: 2px;">• ${goal.name}${penalty}${og}  ${minute}'</div>`;
+                    });
+                }
+                goalsHtml += `</div>`;
+            }
+            
+            return `<div class="match-card"><div class="match-header"><span class="match-round">${match.round?.replace('Matchday','MD') || 'Match'}</span>${match.group ? `<span class="match-group">${match.group}</span>` : ''}</div><div class="match-body"><div class="status-badge status-${status}">${statusText}</div><div class="match-teams"><div class="team">${getFlagUrl(match.team1) ? `<img src="${getFlagUrl(match.team1)}" class="team-flag">` : ''}<div class="team-name">${match.team1}</div>${score ? `<div class="team-score">${score[0]}</div>` : ''}</div><div class="vs">VS</div><div class="team">${getFlagUrl(match.team2) ? `<img src="${getFlagUrl(match.team2)}" class="team-flag">` : ''}<div class="team-name">${match.team2}</div>${score ? `<div class="team-score">${score[1]}</div>` : ''}</div></div>${goalsHtml}<div class="match-info"><div>${formatEstoniaTime(matchTime)}</div></div>${pointsBadge}</div></div>`;
+        }
+
+        async function lockPrediction(matchId, team1, team2) {
+            const s1 = parseInt(document.getElementById(`s1_${matchId}`)?.value);
+            const s2 = parseInt(document.getElementById(`s2_${matchId}`)?.value);
+            if (isNaN(s1) || isNaN(s2)) { showToast('Enter valid scores', true); return; }
+            if (s1 < 0 || s2 < 0 || s1 > 20 || s2 > 20) { showToast('Scores 0-20 only', true); return; }
+            const success = await savePrediction(matchId, s1, s2);
+            if (success) {
+                updateFeatured();
+            }
+        }
+
+        async function editPrediction(matchId) {
+            await deletePrediction(matchId);
+            showToast('Prediction removed');
+            updateFeatured();
+        }
+
+        function sortMatches() {
+            liveMatches = [];
+            upcomingMatches = [];
+            pastMatches = [];
+            
+            allMatches.forEach(m => {
+                const t = parseMatchTime(m);
+                const s = getMatchStatus(m, t);
+                if (s === 'live') liveMatches.push(m);
+                else if (s === 'starting' || s === 'upcoming') upcomingMatches.push(m);
+                else pastMatches.push(m);
+            });
+            
+            
+            upcomingMatches.sort((a, b) => {
+                const timeA = parseMatchTime(a);
+                const timeB = parseMatchTime(b);
+                const now = getCurrentEstoniaTime();
+                return Math.abs(timeA - now) - Math.abs(timeB - now);
+            });
+            
+           
+            pastMatches.sort((a, b) => {
+                const timeA = parseMatchTime(a);
+                const timeB = parseMatchTime(b);
+                return timeB - timeA;
+            });
+            
+            document.getElementById('liveCount').textContent = liveMatches.length;
+            document.getElementById('upcomingCount').textContent = upcomingMatches.length;
+            document.getElementById('pastCount').textContent = pastMatches.length;
+        }
+
+        function renderAll() {
+            document.getElementById('liveMatches').innerHTML = liveMatches.length ? liveMatches.map(m => renderCard(m)).join('') : '<div class="empty-state">⚽ No live matches</div>';
+            document.getElementById('upcomingMatches').innerHTML = upcomingMatches.length ? upcomingMatches.map(m => renderCard(m)).join('') : '<div class="empty-state">📅 No upcoming matches</div>';
+            document.getElementById('pastMatches').innerHTML = pastMatches.length ? pastMatches.map(m => renderCard(m)).join('') : '<div class="empty-state">📋 No past matches</div>';
+        }
+
+        function updateFeatured() {
+            const now = getCurrentEstoniaTime();
+            const upcoming = allMatches.filter(m => {
+                if (m.team1?.match(/^[WL\d]/)) return false;
+                if (m.score?.ft) return false;
+                const t = parseMatchTime(m);
+                const diffMin = (t - now) / 60000;
+                return diffMin > -180;
+            });
+            
+            
+            upcoming.sort((a,b) => {
+                const tA = parseMatchTime(a);
+                const tB = parseMatchTime(b);
+                return Math.abs(tA - now) - Math.abs(tB - now);
+            });
+            
+            const next5 = upcoming.slice(0,5);
+            const container = document.getElementById('featuredMatches');
+            if (container) container.innerHTML = next5.length ? next5.map(m => renderCard(m, true)).join('') : '<div class="empty-state">📅 No upcoming matches</div>';
+        }
+
+        async function fetchData() {
+            try {
+                const res = await fetch('/api?t=' + Date.now());
+                const data = await res.json();
+                if (data.matches) {
+                    allMatches = data.matches;
+                    
+                    const franceMatch = allMatches.find(m => m.team1 === 'France' && m.team2 === 'Senegal');
+                    if (franceMatch) {
+                        console.log('France vs Senegal UTC:', franceMatch.utc);
+                        console.log('Parsed time:', parseMatchTime(franceMatch));
+                        console.log('Formatted Estonia time:', formatEstoniaTime(parseMatchTime(franceMatch)));
+                    }
+                } else {
+                    allMatches = [];
+                }
+                sortMatches();
+                renderAll();
+                updateFeatured();
+                updateTimeDisplay();
+                loadLeaderboard();
+            } catch(e) { console.error(e); showToast('Error loading matches', true); }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            document.querySelector('.tab-btn.' + tab).classList.add('active');
+            if (tab === 'leaderboard') {
+                loadLeaderboard();
+            }
+        }
+
+        async function checkLoginStatus() {
+            try {
+                const res = await fetch('/api/me');
+                const data = await res.json();
+
+                if (data.logged_in) {
+
+                    currentUser = {
+                        username: data.username
+                    };
+
+                    isAdmin = data.is_admin || false;
+
+                    await loadPredictions();
+
+                    document.getElementById('authOverlay').classList.add('hidden');
+                    document.getElementById('app').classList.remove('hidden');
+
+                    updateUserUI();
+                    fetchData();
+                    loadLeaderboard();
+                }
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        
+        window.lockPrediction = lockPrediction;
+        window.editPrediction = editPrediction;
+        window.switchTab = switchTab;
+        window.handleAuth = handleAuth;
+        window.toggleAuthMode = toggleAuthMode;
+        window.logout = logout;
+
+        
+        updateTimeDisplay();
+        setInterval(updateTimeDisplay, 1000);
+        checkLoginStatus();
+    </script>
+</body>
+</html>
