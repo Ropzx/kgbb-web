@@ -4,3 +4,9 @@ worldcup.db
 __pycache__/
 *.pyc
 .vscode/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
