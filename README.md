@@ -4,4 +4,4 @@
 
 <h2>🚀 Live</h2>
 
-[kgbb.site](kgbb.site)
+[kgbb.site](https://kgbb.site)
