@@ -1,5 +1,3 @@
-<h1 align="center" id="title">KGBB WEB</h1>
-
 <p align="center"><img src="https://socialify.git.ci/Ropzx/kgbb-web/image?language=1&amp;owner=1&amp;name=1&amp;stargazers=1&amp;theme=Light" alt="project-image"></p>
 
 <p id="description">Static personal site for random Windows tools and experiments. No backend no database just GitHub Pages.</p>
