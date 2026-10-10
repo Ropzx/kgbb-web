@@ -5,5 +5,3 @@
 <h2>🚀 Live</h2>
 
 [kgbb.site](kgbb.site)
-
-<h2>🛠️ Installation Steps:</h2>
