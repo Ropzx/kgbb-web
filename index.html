@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en" class="dark-fantasy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0910">
+  <meta name="description" content="A collection of tools, experiments, and links.">
+  <title>pulkson</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="stars" aria-hidden="true">
+    <span class="star star-one"></span>
+    <span class="star star-two"></span>
+    <span class="star star-three"></span>
+    <span class="star star-four"></span>
+    <span class="star star-five"></span>
+    <span class="star star-six"></span>
+    <span class="star star-seven"></span>
+    <span class="star star-eight"></span>
+    <span class="star star-nine"></span>
+    <span class="star star-ten"></span>
+    <span class="star star-eleven"></span>
+    <span class="star star-twelve"></span>
+  </div>
+
+  <header class="site-header">
+    <a class="wordmark" href="#tools" aria-label="pulkson home">pulkson<span>.</span></a>
+    <nav class="nav" aria-label="Main navigation">
+      <a class="nav-link active" href="#tools" data-view="tools"><span class="nav-icon"><i class="fa-solid fa-grip" aria-hidden="true"></i></span><span>Tools</span></a>
+      <a class="nav-link" href="#key" data-view="key"><span class="nav-icon"><i class="fa-solid fa-lock" aria-hidden="true"></i></span><span>Unlock</span></a>
+      <a class="nav-link" href="#links" data-view="links"><span class="nav-icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span><span>Links</span></a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="tools" class="page active-page" aria-labelledby="tools-title">
+      <div class="intro">
+        <h1 id="tools-title">Tools<span class="title-period">.</span></h1>
+        <p class="intro-copy">Experiments I've been working on.</p>
+      </div>
+      <div id="toolsList" class="tool-list" aria-live="polite"></div>
+    </section>
+
+    <section id="links" class="page" aria-labelledby="links-title" hidden>
+      <div class="intro">
+        <h1 id="links-title">Links<span class="title-period">.</span></h1>
+      </div>
+      <div class="link-list">
+        <a class="link-card" href="https://github.com/Ropzx" target="_blank" rel="noopener noreferrer">
+          <span class="link-leading"><i class="fa-brands fa-github" aria-hidden="true"></i></span>
+          <span class="link-copy"><strong>GitHub</strong><small>My projects</small></span>
+          <i class="fa-solid fa-arrow-up-right-from-square link-external" aria-hidden="true"></i>
+        </a>
+        <a class="link-card" href="https://github.com/Ropzx/kgbb-web" target="_blank" rel="noopener noreferrer">
+          <span class="link-leading"><i class="fa-solid fa-code" aria-hidden="true"></i></span>
+          <span class="link-copy"><strong>Website repository</strong><small>Source for this website</small></span>
+          <i class="fa-solid fa-arrow-up-right-from-square link-external" aria-hidden="true"></i>
+        </a>
+      </div>
+    </section>
+
+    <section id="key" class="page" aria-labelledby="key-title" hidden>
+      <div class="intro">
+        <h1 id="key-title">Coreseal<span class="title-period">.</span></h1>
+        <p class="intro-copy">Key generator to unlock your Coreseal ransom.</p>
+      </div>
+      <div class="key-card">
+        <label class="field-label" for="tokenInput">Token</label>
+        <div class="key-row">
+          <input id="tokenInput" class="key-input" placeholder="Enter token here" autocomplete="off" spellcheck="false">
+          <button id="genBtn" class="button button-primary" type="button">Generate key <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+        </div>
+        <div id="keyOut" class="key-output" hidden>
+          <div class="output-copy">
+            <span class="field-label">Generated key</span>
+            <code id="keyText"></code>
+          </div>
+          <button id="copyKeyBtn" class="button button-secondary" type="button"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+        </div>
+        <p id="keyStatus" class="key-status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>pulkson</span>
+    <span class="footer-separator" aria-hidden="true">/</span>
+    <span>Built for experiments</span>
+  </footer>
+
+  <script>
+    const TOOLS = [
+      {
+        id: "coreseal",
+        name: "Coreseal",
+        desc: "A windows 'ransomware' that does not encrypt files.",
+        url: "tools/bin/Coreseal.exe",
+        type: "download"
+      },
+      {
+        id: "skeleton",
+        name: "Skeleton",
+        desc: "Mi Bombo skeleton banging shield virus type shi program.",
+        url: "tools/bin/Skeleton.exe",
+        type: "download"
+      }
+    ];
+
+    const pages = [...document.querySelectorAll(".page")];
+    const navLinks = [...document.querySelectorAll(".nav-link")];
+
+    function setView() {
+      const requested = (location.hash || "#tools").slice(1);
+      const view = pages.some(page => page.id === requested) ? requested : "tools";
+
+      document.body.dataset.view = view;
+
+      pages.forEach(page => {
+        const active = page.id === view;
+        page.hidden = !active;
+        page.classList.toggle("active-page", active);
+      });
+
+      navLinks.forEach(link => {
+        const active = link.dataset.view === view;
+        link.classList.toggle("active", active);
+        if (active) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      });
+    }
+
+    function renderTools() {
+      const root = document.getElementById("toolsList");
+      const fragment = document.createDocumentFragment();
+
+      TOOLS.forEach(tool => {
+        const card = document.createElement("article");
+        card.className = "tool-card";
+
+        const details = document.createElement("div");
+        details.className = "tool-details";
+
+        const titleRow = document.createElement("div");
+        titleRow.className = "tool-title-row";
+
+        const icon = document.createElement("span");
+        icon.className = "tool-icon";
+        icon.innerHTML = '<i class="fa-solid fa-terminal" aria-hidden="true"></i>';
+
+        const title = document.createElement("h2");
+        title.className = "tool-name";
+        title.textContent = tool.name;
+
+        titleRow.append(icon, title);
+
+        const description = document.createElement("p");
+        description.className = "tool-description";
+        description.textContent = tool.desc;
+
+        const meta = document.createElement("span");
+
+        details.append(titleRow, description, meta);
+
+        const action = document.createElement("a");
+        action.className = "button button-secondary tool-action";
+        action.href = tool.url;
+        action.setAttribute("aria-label", `Download ${tool.name}`);
+
+        const actionText = document.createElement("span");
+        actionText.textContent = "Download";
+
+        const actionIcon = document.createElement("i");
+        actionIcon.className = "fa-solid fa-arrow-down";
+        actionIcon.setAttribute("aria-hidden", "true");
+
+        action.append(actionText, actionIcon);
+        card.append(details, action);
+        fragment.append(card);
+      });
+
+      root.replaceChildren(fragment);
+    }
+
+    const PEPPER = "k9Qx2vLm7pR4tZ8w";
+    const ALPHABET = "ABCDEFGHJKMNPQRSTVWXYZ23456789";
+
+    async function makeKey(token) {
+      const clean = String(token).replace(/-/g, "").replace(/ /g, "").trim();
+      const data = new TextEncoder().encode(PEPPER + "|" + clean);
+      const buf = await crypto.subtle.digest("SHA-256", data);
+      const bytes = new Uint8Array(buf);
+      let out = "";
+      for (let i = 0; i < 10; i++) out += ALPHABET[bytes[i] % ALPHABET.length];
+      return `KGBB-${out.slice(0, 5)}-${out.slice(5, 10)}`;
+    }
+
+    function initKeyTool() {
+      const input = document.getElementById("tokenInput");
+      const generateButton = document.getElementById("genBtn");
+      const output = document.getElementById("keyOut");
+      const keyText = document.getElementById("keyText");
+      const copyButton = document.getElementById("copyKeyBtn");
+      const status = document.getElementById("keyStatus");
+
+      generateButton.addEventListener("click", async () => {
+        const token = input.value.trim();
+
+        if (!token) {
+          input.setAttribute("aria-invalid", "true");
+          status.textContent = "Enter a token first.";
+          status.className = "key-status error";
+          input.focus();
+          return;
+        }
+
+        input.removeAttribute("aria-invalid");
+        keyText.textContent = await makeKey(token);
+        output.hidden = false;
+        status.textContent = "Key generated.";
+        status.className = "key-status success";
+      });
+
+      input.addEventListener("input", () => {
+        input.removeAttribute("aria-invalid");
+        if (status.classList.contains("error")) {
+          status.textContent = "";
+          status.className = "key-status";
+        }
+      });
+
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") generateButton.click();
+      });
+
+      copyButton.addEventListener("click", async () => {
+        const value = keyText.textContent;
+        if (!value) return;
+
+        try {
+          await navigator.clipboard.writeText(value);
+          status.textContent = "Copied to clipboard.";
+          status.className = "key-status success";
+        } catch {
+          status.textContent = "Clipboard access failed. Select and copy the key manually.";
+          status.className = "key-status error";
+        }
+      });
+    }
+
+    renderTools();
+    initKeyTool();
+
+    if (!location.hash) history.replaceState(null, "", "#tools");
+    setView();
+    window.addEventListener("hashchange", setView);
+  </script>
+</body>
+</html>
